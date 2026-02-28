@@ -15,6 +15,8 @@ from scipy.stats import poisson, chi2
 from scipy.optimize import curve_fit
 import scipy.special as sp
 
+from pathlib import Path
+
 # --------------------------
 # EXTENSIÓN CONTINUA DE POISSON
 # --------------------------
@@ -26,8 +28,10 @@ def main():
     # --------------------------
     # PARÁMETROS INICIALES
     # --------------------------
-    filename = "fondo.dat"    # Archivo de datos
-    nlines = 1                # Número de líneas de cabecera a saltar
+    ruta_datos = Path(__file__).resolve().parent / "data"
+
+    filename = ruta_datos / "fondo.tsv" # Archivo de datos 
+    nlines = 11                        # Número de líneas de cabecera a saltar
     hist_ini, hist_fin = 0, 10
 
     # Bins de anchura constante (centrados en enteros)
@@ -41,7 +45,6 @@ def main():
     # --------------------------
     data = np.loadtxt(filename, skiprows=nlines, usecols=2)
     nmeasu = len(data)
-
     # --------------------------
     # ESTADÍSTICA DESCRIPTIVA
     # --------------------------
