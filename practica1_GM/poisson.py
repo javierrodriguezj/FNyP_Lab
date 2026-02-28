@@ -29,6 +29,7 @@ def main():
     # PARÁMETROS INICIALES
     # --------------------------
     ruta_datos = Path(__file__).resolve().parent / "data"
+    ruta_guardado = Path(__file__).resolve().parent / "results"
 
     filename = ruta_datos / "fondo.tsv" # Archivo de datos 
     nlines = 11                        # Número de líneas de cabecera a saltar
@@ -132,8 +133,8 @@ def main():
     plt.ylabel("frecuencia")
     plt.title("Histograma de anchura constante con ajuste Poisson")
     plt.legend()
-    plt.savefig("poisson_fit.png", dpi=150)
-    plt.savefig("poisson_fit.pdf", dpi=150)
+    plt.savefig(ruta_guardado / "poisson_fit.png", dpi=150)
+    plt.savefig(ruta_guardado / "poisson_fit.pdf", dpi=150)
 
     # Histograma de anchura variable
     plt.figure(figsize=(8,6))
@@ -145,8 +146,8 @@ def main():
     plt.ylabel("frecuencia")
     plt.title("Histograma de anchura variable")
     plt.legend()
-    plt.savefig("poisson.png", dpi=150)
-    plt.savefig("poisson.pdf", dpi=150)
+    plt.savefig(ruta_guardado / "poisson.png", dpi=150)
+    plt.savefig(ruta_guardado / "poisson.pdf", dpi=150)
 
     plt.show()
 
