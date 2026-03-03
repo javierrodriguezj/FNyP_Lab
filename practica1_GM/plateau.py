@@ -11,50 +11,46 @@ def main():
 
     filename = ruta_datos / "parte1.tsv" # Archivo de datos 
     nlines = 11                        # Número de líneas de cabecera a saltar
-    hist_ini, hist_fin = 0, 10
 
     # --------------------------
     # LECTURA DE DATOS
     # --------------------------
     data = np.loadtxt(filename, skiprows=nlines, usecols=2)
+    voltage = np.loadtxt(filename, skiprows=nlines, usecols=1)
     nmeasu = len(data)
 
     # --------------------------
     # GRÁFICOS
     # --------------------------
-    # Histograma de anchura constante + curva suave
     plt.figure(figsize=(8,6))
-    plt.errorbar(bin_centers_const, hist_counts_const,
-                 yerr=np.sqrt(hist_counts_const), fmt='o', label='Observado')
-    # Ajuste en versión histograma
-    plt.step(edges_const, np.append(expected_const, expected_const[-1]),
-             where="post", color="r", label='Ajuste Poisson (histograma)')
+    plt.grid()
+    plt.plot(voltage,data,'lightskyblue')
+    plt.plot(voltage, data,'o')
+
+  # 1. Flecha y texto para Vs (El punto de inicio)
+    plt.annotate('$V_s$', xy=(voltage[4], data[4]), xytext=(450, 1000),
+             arrowprops=dict(facecolor='k', edgecolor='k', arrowstyle='->', lw=2))
+
+# 2. Flecha de doble sentido para la "Curva Plateau"
+    plt.annotate('', xy=(voltage[5], data[-6]+500), xytext=(voltage[-6], data[-6]+500), 
+             arrowprops=dict(arrowstyle='<->', color='limegreen', lw=2))
+    plt.text(650, 8500, 'Geiger plateau', color='limegreen', ha='center', fontweight='bold')
+
+# 3. Flecha para la región de descarga continua
+    plt.annotate('', xy=(1050, 9000), xytext=(1000, 10000),  
+             arrowprops=dict(arrowstyle='->', color='black', lw=2))
+    plt.text(1000, 10000, 'Región de descarga\ncontinua', color='k', ha='center', fontweight='bold')
+
+    plt.annotate('$V_1$', xy=(voltage[5], 9000), xytext=(voltage[5], 6000),  
+            arrowprops=dict(linestyle='--', color='limegreen', lw=1,arrowstyle='-'))
+
+    plt.annotate('$V_2$', xy=(voltage[-5], 9000), xytext=(voltage[-5], 6000),  
+            arrowprops=dict(linestyle='--', color='limegreen', lw=1,arrowstyle='-'))
     
-    # Ajuste en versión curva suave (extensión gamma)
-    x_dense = np.linspace(hist_ini, hist_fin, 500)
-    y_dense = nmeasu * poisson_continuous(x_dense, lamb_fit)
-    plt.plot(x_dense, y_dense, "b--", lw=2, label='Ajuste Poisson (curva suave)')
-    plt.xlabel("# cuentas")
-    plt.ylabel("frecuencia")
-    plt.title("Histograma de anchura constante con ajuste Poisson")
-    plt.legend()
-    plt.savefig(ruta_guardado / "poisson_fit.png", dpi=150)
-    plt.savefig(ruta_guardado / "poisson_fit.pdf", dpi=150)
-
-    # Histograma de anchura variable
-    plt.figure(figsize=(8,6))
-    plt.errorbar(bin_centers_var, hist_counts_var,
-                 yerr=np.sqrt(hist_counts_var), fmt='o', label='Observado')
-    plt.step(edges_var, np.append(expected_var, expected_var[-1]),
-             where="post", color="r", label='Esperado (Poisson)')
-    plt.xlabel("# cuentas")
-    plt.ylabel("frecuencia")
-    plt.title("Histograma de anchura variable")
-    plt.legend()
-    plt.savefig(ruta_guardado / "poisson.png", dpi=150)
-    plt.savefig(ruta_guardado / "poisson.pdf", dpi=150)
-
-    plt.show()
+    plt.xlabel(f"Voltaje ($V$)")
+    plt.ylabel(f"g ($cuentas/30 s$)")
+    plt.title("Curva Plateau del GM")
+    plt.savefig(ruta_resultados / "plateau.png", dpi=150)
 
 if __name__ == "__main__":
     main()
