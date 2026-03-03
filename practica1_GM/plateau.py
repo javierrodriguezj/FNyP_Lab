@@ -63,8 +63,26 @@ def main():
     V2=voltage[-6]
     V1=voltage[5]
 
-    m=(g2-g1)/(V2-V1)*100/g1
-    print(f"Pendiente del plateau: {m:.8f} %/100V")
+    m_100=(g2-g1)/(V2-V1)*100/g1
+    m=(g2-g1)/(V2-V1)
+    print(f"Pendiente del plateau: {m_100:.8f} %/100V")
+
+    V_t=V1+0.25*(V2-V1)
+    print(f"Voltaje de trabajo: {V_t:.0f} V")
+
+    plt.figure(figsize=(8,6))
+    plt.grid()
+    plt.plot(voltage,data,'lightskyblue')
+    plt.plot(voltage, data,'o')
+    plt.annotate('', xy=(voltage[5], data[5]), xytext=(voltage[-6], data[-6]),  
+        arrowprops=dict(linestyle='--', color='red', lw=2,arrowstyle='-'))
+    
+    plt.xlabel(f"Voltaje ($V$)")
+    plt.ylabel(f"g ($cuentas/30 s$)")
+    plt.title("Curva Plateau del GM")
+    plt.savefig(ruta_resultados / "plateau_recta.png", dpi=150)
+
+
 
 
 if __name__ == "__main__":
