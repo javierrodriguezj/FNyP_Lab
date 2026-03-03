@@ -41,11 +41,13 @@ def main():
              arrowprops=dict(arrowstyle='->', color='black', lw=2))
     plt.text(1000, 10000, 'Región de descarga\ncontinua', color='k', ha='center', fontweight='bold')
 
-    plt.annotate('$V_1$', xy=(voltage[5], 9000), xytext=(voltage[5], 6000),  
-            arrowprops=dict(linestyle='--', color='limegreen', lw=1,arrowstyle='-'))
+    plt.annotate('', xy=(400, 9000), xytext=(400, 6000),  
+            arrowprops=dict(linestyle='--', color='limegreen', lw=2,arrowstyle='-'))
+    plt.text(410, 5600, '$V_1$', color='limegreen', ha='center', fontweight='bold')
 
-    plt.annotate('$V_2$', xy=(voltage[-5], 9000), xytext=(voltage[-5], 6000),  
-            arrowprops=dict(linestyle='--', color='limegreen', lw=1,arrowstyle='-'))
+    plt.annotate('', xy=(1000, 9000), xytext=(1000, 6000),  
+            arrowprops=dict(linestyle='--', color='limegreen', lw=2,arrowstyle='-'))
+    plt.text(1000, 5600, '$V_2$', color='limegreen', ha='center', fontweight='bold')
     
     plt.xlabel(f"Voltaje ($V$)")
     plt.ylabel(f"g ($cuentas/30 s$)")
