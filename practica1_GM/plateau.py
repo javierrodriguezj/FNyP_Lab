@@ -54,5 +54,18 @@ def main():
     plt.title("Curva Plateau del GM")
     plt.savefig(ruta_resultados / "plateau.png", dpi=150)
 
+
+    ###########
+    # pendiente
+    ###########
+    g2=data[-6]
+    g1=data[5]
+    V2=voltage[-6]
+    V1=voltage[5]
+
+    m=(g2-g1)/(V2-V1)*100/g1
+    print(f"Pendiente del plateau: {m:.8f} %/100V")
+
+
 if __name__ == "__main__":
     main()
