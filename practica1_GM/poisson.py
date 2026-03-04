@@ -51,6 +51,7 @@ def main():
     # --------------------------
     mean = np.mean(data)
     sample_variance = np.var(data, ddof=1)
+    sample_std = np.sqrt(sample_variance)
     mean_error = np.sqrt(sample_variance / nmeasu)
 
     # --------------------------
@@ -100,7 +101,7 @@ def main():
     ndof = np.sum(mask) - 1
     p_value = 1 - chi2.cdf(chi2_val, ndof)
 
-    print(f"\nMedia de las {nmeasu} medidas: {mean:.7f} ± {mean_error:.7f}")
+    print(f"\nMedia de las {nmeasu} medidas: {mean:.7f} ± {mean_error:.7f}\n Desviación estándar muestral: {sample_std:.4f}\n")
     print("Ajuste Poisson (bins constantes):")
     print(f"  λ = {lamb_fit:.4f} ± {lamb_err:.4f}")
     print(f"  Chi2 / ndf = {chi2_val:.4f} / {ndof}")
