@@ -39,7 +39,7 @@ def main():
     edges_const = np.arange(hist_ini - 0.5, hist_fin + 1.5, 1.0)
 
     # Bins de anchura variable (ejemplo: últimos valores agrupados)
-    edges_var = np.array([-0.5, 0.5, 1.5, 2.5, 3.5, 4.5, 10.5])
+    edges_var = np.array([-0.5, 0.5, 1.5, 2.5, 3.5, 4.5,10.5])
 
     # --------------------------
     # LECTURA DE DATOS
