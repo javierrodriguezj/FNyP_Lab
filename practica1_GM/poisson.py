@@ -20,9 +20,13 @@ from pathlib import Path
 # --------------------------
 # EXTENSIÓN CONTINUA DE POISSON
 # --------------------------
+# def poisson_continuous(x, lamb):
+#     """Extensión continua de la Poisson usando la función Gamma."""
+#     return np.exp(-lamb) * (lamb**x) / sp.gamma(x+1)
 def poisson_continuous(x, lamb):
-    """Extensión continua de la Poisson usando la función Gamma."""
-    return np.exp(-lamb) * (lamb**x) / sp.gamma(x+1)
+    """Extensión continua de la Poisson usando logaritmos para evitar overflow/underflow."""
+    log_p = x * np.log(lamb) - lamb - sp.gammaln(x + 1)
+    return np.exp(log_p)
 
 def main():
     # --------------------------
@@ -31,16 +35,15 @@ def main():
     ruta_datos = Path(__file__).resolve().parent / "data"
     ruta_guardado = Path(__file__).resolve().parent / "results"
 
-    filename = ruta_datos / "fondo.tsv" # Archivo de datos 
+    filename = ruta_datos / "parte4.tsv" # Archivo de datos 
     nlines = 11                        # Número de líneas de cabecera a saltar
-    hist_ini, hist_fin = 0, 10
+    hist_ini, hist_fin = 3050, 3300
 
     # Bins de anchura constante (centrados en enteros)
-    edges_const = np.arange(hist_ini - 0.5, hist_fin + 1.5, 1.0)
+    edges_const = np.arange(hist_ini - 0.5, hist_fin + 1.5, 30)
 
     # Bins de anchura variable (ejemplo: últimos valores agrupados)
-    edges_var = np.array([-0.5, 0.5, 1.5, 2.5, 3.5, 4.5,10.5])
-
+    edges_var = np.array([3050.5, 3100.5, 3150.5, 3175.5, 3200.5, 3225.5, 3250.5,3275.5, 3300.5])
     # --------------------------
     # LECTURA DE DATOS
     # --------------------------
@@ -66,16 +69,22 @@ def main():
     # --------------------------
     # AJUSTE DE POISSON
     # --------------------------
+    # def poisson_model(k, lamb):
+    #     return nmeasu * poisson.pmf(k, lamb)
+
+    bin_width_const = edges_const[1] - edges_const[0]
+
     def poisson_model(k, lamb):
-        return nmeasu * poisson.pmf(k, lamb)
+        return nmeasu * poisson_continuous(k, lamb) * bin_width_const
 
     mask = hist_counts_const > 0
     popt, pcov = curve_fit(poisson_model,
                            bin_centers_const[mask],
                            hist_counts_const[mask],
                            p0=[mean],
+                           bounds=(1, 10000),
                            sigma=np.sqrt(hist_counts_const[mask]),
-                           absolute_sigma=True)
+                           absolute_sigma=True) 
     lamb_fit = popt[0]
     lamb_err = np.sqrt(np.diag(pcov))[0]
 
@@ -128,14 +137,14 @@ def main():
              where="post", color="r", label='Ajuste Poisson (histograma)')
     # Ajuste en versión curva suave (extensión gamma)
     x_dense = np.linspace(hist_ini, hist_fin, 500)
-    y_dense = nmeasu * poisson_continuous(x_dense, lamb_fit)
+    y_dense = nmeasu * poisson_continuous(x_dense, lamb_fit) * bin_width_const
     plt.plot(x_dense, y_dense, "b--", lw=2, label='Ajuste Poisson (curva suave)')
     plt.xlabel("# cuentas")
     plt.ylabel("frecuencia")
     plt.title("Histograma de anchura constante con ajuste Poisson")
     plt.legend()
-    plt.savefig(ruta_guardado / "poisson_fit.png", dpi=150)
-    plt.savefig(ruta_guardado / "poisson_fit.pdf", dpi=150)
+    plt.savefig(ruta_guardado / "poisson_fit_4.png", dpi=150)
+    plt.savefig(ruta_guardado / "poisson_fit_4.pdf", dpi=150)
 
     # Histograma de anchura variable
     plt.figure(figsize=(8,6))
@@ -147,8 +156,8 @@ def main():
     plt.ylabel("frecuencia")
     plt.title("Histograma de anchura variable")
     plt.legend()
-    plt.savefig(ruta_guardado / "poisson.png", dpi=150)
-    plt.savefig(ruta_guardado / "poisson.pdf", dpi=150)
+    plt.savefig(ruta_guardado / "poisson_4.png", dpi=150)
+    plt.savefig(ruta_guardado / "poisson_4.pdf", dpi=150)
 
     plt.show()
 
