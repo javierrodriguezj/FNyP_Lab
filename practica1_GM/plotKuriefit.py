@@ -2,6 +2,8 @@ import numpy as np
 from scipy.integrate import quad, fixed_quad
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
+from sklearn.metrics import r2_score
+
 
 #############################
 # 1. Constantes y funciones auxiliares
@@ -292,7 +294,7 @@ def print_fit_results_scipy(label, popt, perr, chi2, ndf, fixed_params={}):
 # 6. Lectura de datos y flujo principal
 #############################
 
-def plotKuriefit_np(filename_root="Sr-90", save_figures=True):
+def plotKuriefit_np(filename_root="Sr-90", save_figures=False):
     """
     Lee un archivo 'Sr-90.fit', extrae datos y
     ajusta usando las funciones definidas arriba.
@@ -548,8 +550,61 @@ def plotKuriefit_np(filename_root="Sr-90", save_figures=True):
     plt.legend()
 
     if save_figures:
-        plt.savefig(f"{filename_root}_plotKurie_Te_noROOT.pdf")
         plt.savefig(f"{filename_root}_plotKurie_Te_noROOT.png")
+    plt.show()
+
+
+#############################
+# 6.4. ajuste lineal (javi haciendo cosas raras)
+#############################
+
+    mascara_buena = (Te_data >= 0.8) & (Te_data <= 2.2) & (kurie_vals > 0)
+    
+    te = Te_data[mascara_buena]
+    k_vals = kurie_vals[mascara_buena]
+    err_kurie = kurie_errs[mascara_buena]
+    err_te = errTe_data[mascara_buena]
+
+    # 2. Realizar el ajuste lineal (Grado 1)
+    # p[0] es la pendiente (m), p[1] es la ordenada en el origen (n)
+    p = np.polyfit(te, k_vals, 1)
+    m, n = p
+
+    # 3. Calcular el R^2
+    y_pred = np.polyval(p, te)
+    r_squared = r2_score(k_vals, y_pred)
+
+    # 4. Calcular el punto de corte con el eje X (Energía Q)
+    # Si 0 = m*Q + n  =>  Q = -n / m
+    Q_exp = -n / m
+
+    # 5. Crear la gráfica
+    plt.figure(figsize=(8, 6))
+
+    # Puntos experimentales
+    plt.errorbar(te, k_vals, xerr=err_te, yerr=err_kurie, fmt='o', ecolor='royalblue', 
+                markerfacecolor='red', capsize=3, label='Datos Kurie')
+
+    # Línea del ajuste
+    te_fit = np.linspace(min(te), Q_exp, 100) # Dibujamos hasta el corte con el eje X
+    plt.plot(te_fit, np.polyval(p, te_fit), 'k--', label='Ajuste lineal')
+
+    # 6. ESCRIBIR LA ECUACIÓN Y R2 EN LA GRÁFICA
+    texto_ajuste = (f'Ecuación: $y = {m:.2f}x + {n:.2f}$\n'
+                    f'$R^2 = {r_squared:.4f}$\n'
+                    f'$Q$ medido $= {Q_exp:.3f}$ MeV')
+
+    # Usamos plt.text para poner el cuadro. transform=plt.gca().transAxes usa coordenadas 0 a 1
+    plt.text(0.05, 0.15, texto_ajuste, fontsize=12, bbox=dict(facecolor='white', alpha=0.7),
+            transform=plt.gca().transAxes)
+
+    # Estética
+    plt.title('Ajuste lineal - Plot de Kurie $^{90}Sr/Y$')
+    plt.xlabel('Energía $T_e$ [MeV]')
+    plt.ylabel('$\sqrt{N / (f \cdot F)}$')
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+
     plt.show()
 
 
@@ -558,4 +613,4 @@ def plotKuriefit_np(filename_root="Sr-90", save_figures=True):
 #############################
 if __name__ == "__main__":
     # Puedes elegir si se guardan figuras (True/False)
-    plotKuriefit_np("Sr-90", save_figures=True)
+    plotKuriefit_np("Sr-90_fondo", save_figures=True)
